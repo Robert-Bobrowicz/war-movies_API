@@ -1,0 +1,18 @@
+{
+  "name": "war_movies",
+  "version": "1.0.0",
+  "description": "II World War movies collection",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "MeRB",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "json-server": "^1.0.0-alpha.22",
+    "uuid": "^9.0.1"
+  }
+}
