@@ -1,0 +1,28 @@
+{
+  "users": [
+    {
+      "name": "John",
+      "password": "password1"
+    },
+    {
+      "name": "Tom",
+      "password": "password2"
+    },
+    {
+      "name": "Pete",
+      "password": "password3"
+    },
+    {
+      "name": "Lucia",
+      "password": "$2b$12$GrdNfgtHBaOix/vekJccZ.dqllWrPRbhBTJOaORexZzZ1LSM.Pjnu"
+    },
+    {
+      "name": "Naomi",
+      "password": "$2b$12$AVli/.lt/nz2L.jQoDpd0Ort9AQZFozcL.TR6dI4Dv/di8/4G3c6."
+    },
+    {
+      "name": "Eylem",
+      "password": "$2b$12$LsynMB5fUn7P.xku4DiCQegXdDmpByqGaWo7AM5iyhQa8dQOW4u8G"
+    }
+  ]
+}

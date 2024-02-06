@@ -3,10 +3,18 @@ const app = express();
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
+const { log } = require('console');
+const {
+    getHashes,
+    createHash
+} = require('node:crypto');
+const bcrypt = require('bcrypt');
 
 
 app.use(cors());
+app.use(express.json());
 
+const users = JSON.parse(fs.readFileSync('./authorization/users.json')); console.log(users);
 
 const moviesDB = {
     listName: 'Ulubione',
@@ -91,6 +99,73 @@ app.get('/movies/:id', (req, res) => {
     res.status(200).send(movie);
 });
 
+app.post('/users', async (req, res) => {
+    const user = {
+        name: req.body.name,
+        password: req.body.password
+    };
+    const hashedPassword = await bcrypt.hash(user.password, 12);
+    const path = './authorization/users.json';
+    user.password = hashedPassword;
+    users.users.push(user);
+    console.log(users);
+
+    storeUser(users, path);
+
+    res.send('User added');
+});
+
+app.post('/users/login', async (req, res) => {
+    const user = users.users.find(user => user.name === req.body.name);
+    console.log(user);
+    if (!user) return res.status(400).send('Can not find user');
+    try {
+        if (await bcrypt.compare(req.body.password, user.password)) {
+            res.send('Success');
+        } else {
+            res.send('Not allowed.')
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('Smth went wrong.');
+    }
+});
+
+//request params 
+app.get('/users/:name/:password', (req, res, next) => { console.log('this is middleware for the user'); next() }, async (req, res) => {
+    try {
+        const user = req.params;
+        const name = user.name; console.log(name);
+        let password = user.password;
+
+        //hash password using crypto
+        const hashAlgorithm = 'sha256';
+
+        function hash(content, algorithm) {
+            const hashed = createHash(algorithm).update(content).digest('hex');
+            return hashed;
+        };
+
+        const hashedPassword1 = await hash(password, hashAlgorithm); console.log(hashedPassword1);
+
+        //hash password using bcrypt
+        const hashedPassword2 = await bcrypt.hash(password, 12); console.log(hashedPassword2);
+
+        const reply = {
+            user: name,
+            password1: hashedPassword1,
+            password2: hashedPassword2
+        }
+
+        res.send(reply).status(201);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('Smth went wrong.')
+    }
+});
+
+
+
 app.listen(3003, () => console.log('Server runing & listening on port 3003'));
 
 
@@ -114,3 +189,13 @@ const storeData = (data, path) => {
 const path = './data/moviesDB.json';
 
 storeData(moviesDB, path);
+
+
+//save user to a file users.js
+const storeUser = (data, path) => {
+    try {
+        fs.writeFileSync(path, JSON.stringify(data, null, 2))
+    } catch (err) {
+        console.error(err)
+    }
+};
