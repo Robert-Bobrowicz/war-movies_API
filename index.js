@@ -9,17 +9,20 @@ const {
     createHash
 } = require('node:crypto');
 const bcrypt = require('bcrypt');
+const { checkUser } = require('./authorization/checkUser');
+const { authUser, authUserRole } = require('./authorization/userAuth');
 
-
-app.use(cors());
 app.use(express.json());
+app.use(cors());
+app.use(checkUser);
+
 
 const users = JSON.parse(fs.readFileSync('./authorization/users.json')); console.log(users);
 
 const moviesDB = {
     listName: 'Ulubione',
     movies: [
-        { id: uuidv4(), title: 'Kompania braci', year: '2001' },
+        { id: 123, title: 'Kompania braci', year: '2001' },
         { id: uuidv4(), title: 'Oddział bohaterów', year: '2013' },
         { id: uuidv4(), title: 'Pacyfik', year: '2010' },
         { id: uuidv4(), title: 'Mistrz' },
@@ -85,14 +88,14 @@ const moviesDB = {
 };
 
 app.get('/', (req, res) => {
-    res.send("Server War Movies");
+    res.send("Main page of War Movies");
 });
 
-app.get('/movies', (req, res) => {
+app.get('/movies', authUser, (req, res) => {
     res.send(moviesDB);
 });
 
-app.get('/movies/:id', (req, res) => {
+app.get('/movies/:id', authUser, (req, res) => {
     const movie = moviesDB.movies.find(movie => movie.id === parseInt(req.params.id));
     if (!movie) res.status(404).send(`The movie with given id = ${req.params.id} was not found in our movies database.`);
 
@@ -164,6 +167,9 @@ app.get('/users/:name/:password', (req, res, next) => { console.log('this is mid
     }
 });
 
+app.get('/users/admin', authUser, authUserRole('admin'), (req, res) => {
+    res.status(200).send('Admin page');
+});
 
 
 app.listen(3003, () => console.log('Server runing & listening on port 3003'));
