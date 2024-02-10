@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const cors = require('cors');
@@ -11,6 +12,7 @@ const {
 const bcrypt = require('bcrypt');
 const { checkUser } = require('./authorization/checkUser');
 const { authUser, authUserRole } = require('./authorization/userAuth');
+const jwt = require('jsonwebtoken');
 
 app.use(express.json());
 app.use(cors());
@@ -91,7 +93,7 @@ app.get('/', (req, res) => {
     res.send("Main page of War Movies");
 });
 
-app.get('/movies', authUser, (req, res) => {
+app.get('/movies', authUser, authenticateToken, (req, res) => {
     res.send(moviesDB);
 });
 
@@ -124,7 +126,9 @@ app.post('/users/login', async (req, res) => {
     if (!user) return res.status(400).send('Can not find user');
     try {
         if (await bcrypt.compare(req.body.password, user.password)) {
-            res.send('Success');
+            // const userToAccess = { name: user.name }
+            const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
+            res.json({ accessToken: accessToken, status: 'Success' });
         } else {
             res.send('Not allowed.')
         }
@@ -132,6 +136,9 @@ app.post('/users/login', async (req, res) => {
         console.log(err);
         res.status(500).send('Smth went wrong.');
     }
+
+
+
 });
 
 //request params 
@@ -205,3 +212,22 @@ const storeUser = (data, path) => {
         console.error(err)
     }
 };
+
+
+//middleware authenticate token jwt
+function authenticateToken(req, res, next) {
+
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (token === null) return res.status(401);
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+        if (err) return res.status(403).send('Not authorized.');
+        if (user.name !== req.user.name) return res.status(403).send('Not authorized user.');
+        req.user = user;
+        console.log('From token verify: ', user);
+        next();
+    })
+    console.log(token);
+}
