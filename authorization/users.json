@@ -29,6 +29,21 @@
       "name": "Eylem",
       "password": "$2b$12$LsynMB5fUn7P.xku4DiCQegXdDmpByqGaWo7AM5iyhQa8dQOW4u8G",
       "role": "standard"
+    },
+    {
+      "name": "Hong Jung",
+      "password": "$2b$12$RY3YKwDbdOH8poIrPEgFsunq8LlNvUGI.ihc7kBY2f3UEdkPrVkEm",
+      "role": "standard"
+    },
+    {
+      "name": "Mi-ja",
+      "password": "$2b$12$ZEQeZgjnoUM0hVqJ4c/LX.HNnyUzJ9JdqweJp1T2hLAbFNYqkQnem",
+      "role": "standard"
+    },
+    {
+      "name": "Yumiko",
+      "password": "$2b$12$MHQGfbekjfYapVX1XHKJ1egRLviDxeepWD6KOsa7ao66C9sPcviha",
+      "role": "standard"
     }
   ]
 }

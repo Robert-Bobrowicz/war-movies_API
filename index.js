@@ -93,7 +93,7 @@ app.get('/', (req, res) => {
     res.send("Main page of War Movies");
 });
 
-app.get('/movies', authUser, authenticateToken, (req, res) => {
+app.get('/movies', checkUser, authenticateToken, (req, res) => {
     res.send(moviesDB);
 });
 
@@ -216,15 +216,24 @@ const storeUser = (data, path) => {
 
 //middleware authenticate token jwt
 function authenticateToken(req, res, next) {
-
+    const userData = {
+        name: req.body.name
+    }
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
     if (token === null) return res.status(401);
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-        if (err) return res.status(403).send('Not authorized.');
-        if (user.name !== req.user.name) return res.status(403).send('Not authorized user.');
+        console.log('user data: ', user);
+        if (err) {
+            console.log(err);
+            return res.status(403).send('Not authorized.')
+        };
+        if (user.name !== userData.name) {
+            console.log('from autheticate token - user data: ', user);
+            return res.status(403).send('Not authorized user.')
+        };
         req.user = user;
         console.log('From token verify: ', user);
         next();
